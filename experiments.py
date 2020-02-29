@@ -56,8 +56,8 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     print('----------3-----------')
     # then we transform the transformed id as the results
     mdl.fit(x=x_train_task_transformed, y=to_categorical(transformations_inds),
-            batch_size=batch_size, epochs=1
-            # epochs=int(np.ceil(200/transformer.n_transforms))
+            batch_size=batch_size,
+            epochs=int(np.ceil(200/transformer.n_transforms))
             )
     print('----------4-----------')
     #################################################################################################
@@ -104,7 +104,6 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     scores = np.zeros((len(x_test),))
     observed_data = x_train_task
     for t_ind in range(transformer.n_transforms):
-        continue
         observed_dirichlet = mdl.predict(transformer.transform_batch(observed_data, [t_ind] * len(observed_data)),
                                          batch_size=1024)
         log_p_hat_train = np.log(observed_dirichlet).mean(axis=0)
@@ -121,9 +120,6 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     scores /= transformer.n_transforms
     labels = y_test.flatten() == single_class_ind
     print('----------5-----------')
-    if not os.path.exists(RESULTS_DIR + dataset_name):
-        os.makedirs(RESULTS_DIR + dataset_name)
-        print('New file created')
     res_file_name = '{}_transformations_{}_{}.npz'.format(dataset_name,
                                                  get_class_name_from_index(single_class_ind, dataset_name),
                                                  datetime.now().strftime('%Y-%m-%d-%H%M'))
