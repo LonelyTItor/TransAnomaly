@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from sklearn.metrics import roc_curve, precision_recall_curve, auc
 from keras.datasets import mnist, fashion_mnist, cifar100, cifar10
+import sem
 from keras.backend import cast_to_floatx
 
 
@@ -66,6 +67,12 @@ def load_cifar10():
 
 def load_cifar100(label_mode='coarse'):
     (X_train, y_train), (X_test, y_test) = cifar100.load_data(label_mode=label_mode)
+    X_train = normalize_minus1_1(cast_to_floatx(X_train))
+    X_test = normalize_minus1_1(cast_to_floatx(X_test))
+    return (X_train, y_train), (X_test, y_test)
+
+def load_sem():
+    (X_train, y_train), (X_test, y_test) = sem.load_data()
     X_train = normalize_minus1_1(cast_to_floatx(X_train))
     X_test = normalize_minus1_1(cast_to_floatx(X_test))
     return (X_train, y_train), (X_test, y_test)
@@ -142,6 +149,7 @@ def get_class_name_from_index(index, dataset_name):
         'fashion-mnist': ('t-shirt', 'trouser', 'pullover', 'dress', 'coat', 'sandal', 'shirt', 'sneaker', 'bag',
                           'ankle-boot'),
         'cats-vs-dogs': ('cat', 'dog'),
+        'sem': ('normal', 'anomalous')
     }
 
     return ind_to_name[dataset_name][index]

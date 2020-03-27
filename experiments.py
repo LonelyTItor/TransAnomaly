@@ -14,7 +14,7 @@ from sklearn.externals.joblib import Parallel, delayed
 from keras.models import Model, Input, Sequential
 from keras.layers import Dense, Dropout
 from keras.utils import to_categorical
-from utils import load_cifar10, load_cats_vs_dogs, load_fashion_mnist, load_cifar100
+from utils import load_cifar10, load_cats_vs_dogs, load_fashion_mnist, load_cifar100, load_sem
 from utils import save_roc_pr_curve_data, get_class_name_from_index, get_channels_axis
 from transformations import Transformer
 from models.wide_residual_network import create_wide_residual_network
@@ -57,7 +57,8 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     # then we transform the transformed id as the results
     mdl.fit(x=x_train_task_transformed, y=to_categorical(transformations_inds),
             batch_size=batch_size,
-            epochs=int(np.ceil(200/transformer.n_transforms))
+            # epochs=int(np.ceil(200/transformer.n_transforms))
+            epochs=1
             )
     print('----------4-----------')
     #################################################################################################
@@ -104,6 +105,7 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     scores = np.zeros((len(x_test),))
     observed_data = x_train_task
     for t_ind in range(transformer.n_transforms):
+        # observerd_derichlet the score of the probability of each transformation
         observed_dirichlet = mdl.predict(transformer.transform_batch(observed_data, [t_ind] * len(observed_data)),
                                          batch_size=1024)
         log_p_hat_train = np.log(observed_dirichlet).mean(axis=0)
@@ -358,7 +360,7 @@ def run_experiments(load_dataset_fn, dataset_name, q, n_classes):
     # for c in range(n_classes):
     #     _raw_ocsvm_experiment(load_dataset_fn, dataset_name, c)
 
-    n_runs = 5
+    n_runs = 2
 
     # Transformations
     for _ in range(n_runs):
@@ -451,10 +453,11 @@ if __name__ == '__main__':
         q.put(str(g))
 
     experiments_list = [
-        (load_cifar10, 'cifar10', 10),
+        # (load_cifar10, 'cifar10', 10),
         # (load_cifar100, 'cifar100', 20),
         # (load_fashion_mnist, 'fashion-mnist', 10),
         # (load_cats_vs_dogs, 'cats-vs-dogs', 2),
+        (load_sem, 'sem', 2)
     ]
 
     for data_load_fn, dataset_name, n_classes in experiments_list:

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@sftp://jiaqi@202.120.40.150:9005/home/jiaqi/anaconda3/envs/TransAnomaly/bin/python3.7" />
+      </list>
+    </list>
+  </component>
+</project>

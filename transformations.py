@@ -37,6 +37,7 @@ class AbstractTransformer(abc.ABC):
     def _create_transformation_list(self):
         return
 
+    # 这个 object list 的写法也太酷了，一下子包含了好多重transform的class，只需要用idx调整即可
     def transform_batch(self, x_batch, t_inds):
         assert len(x_batch) == len(t_inds)
 
