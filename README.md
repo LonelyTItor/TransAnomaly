@@ -10,6 +10,18 @@ It includes all experiments reported in the paper.
 * Keras 2.2.0
 * Tensorflow 1.8.0
 * sklearn 0.19.1
+* Pillow 7.0.0
+
+## How to start
+Run experiments.py first to get the results 
+Then run showRes to show the roc curve 
+
+## ROC of sliding window 
+* Mar. 28th
+We firstly come up with a naive sliding window method, and we have our results like below:
+
+![](img/sliding_roc.png)
+
 
 ## Citation
 If you use the ideas or method presented in the paper, please cite:

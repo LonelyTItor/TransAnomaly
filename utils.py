@@ -72,10 +72,10 @@ def load_cifar100(label_mode='coarse'):
     return (X_train, y_train), (X_test, y_test)
 
 def load_sem():
-    (X_train, y_train), (X_test, y_test) = sem.load_data()
+    (X_train, y_train), (X_test, y_test, labels) = sem.load_data()
     X_train = normalize_minus1_1(cast_to_floatx(X_train))
     X_test = normalize_minus1_1(cast_to_floatx(X_test))
-    return (X_train, y_train), (X_test, y_test)
+    return (X_train, y_train), (X_test, y_test, labels)
 
 
 def save_roc_pr_curve_data(scores, labels, file_path):
@@ -153,3 +153,5 @@ def get_class_name_from_index(index, dataset_name):
     }
 
     return ind_to_name[dataset_name][index]
+
+

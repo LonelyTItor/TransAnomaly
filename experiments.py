@@ -21,6 +21,7 @@ from models.wide_residual_network import create_wide_residual_network
 from models.encoders_decoders import conv_encoder, conv_decoder
 from models import dsebm, dagmm, adgan
 import keras.backend as K
+import time
 
 RESULTS_DIR = './res/'
 
@@ -30,7 +31,7 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu_to_use
 
     # Seperately load the training data and the
-    (x_train, y_train), (x_test, y_test) = dataset_load_fn()
+    (x_train, y_train), (x_test, y_test, test_label) = dataset_load_fn()
 
     print('----------1-----------')
     if dataset_name in ['cats-vs-dogs']:
@@ -58,7 +59,7 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     mdl.fit(x=x_train_task_transformed, y=to_categorical(transformations_inds),
             batch_size=batch_size,
             # epochs=int(np.ceil(200/transformer.n_transforms))
-            epochs=1
+            epochs=3
             )
     print('----------4-----------')
     #################################################################################################
@@ -105,6 +106,7 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
     scores = np.zeros((len(x_test),))
     observed_data = x_train_task
     for t_ind in range(transformer.n_transforms):
+        start_time = time.localtime()
         # observerd_derichlet the score of the probability of each transformation
         observed_dirichlet = mdl.predict(transformer.transform_batch(observed_data, [t_ind] * len(observed_data)),
                                          batch_size=1024)
@@ -118,8 +120,13 @@ def _transformations_experiment(dataset_load_fn, dataset_name, single_class_ind,
         x_test_p = mdl.predict(transformer.transform_batch(x_test, [t_ind] * len(x_test)),
                                batch_size=1024)
         scores += dirichlet_normality_score(mle_alpha_t, x_test_p)
+        end_time = time.localtime()
+        interval = TimeLine(start_time, end_time)
+        estimated_time = int(interval) * (int(transformer.n_transforms) - t_ind)
+        print("The leaving processing time is : ", estimated_time // 60, ' : ', estimated_time % 60)
 
     scores /= transformer.n_transforms
+    np.save('./mid_data/scores.npy', scores)
     labels = y_test.flatten() == single_class_ind
     print('----------5-----------')
     res_file_name = '{}_transformations_{}_{}.npz'.format(dataset_name,
@@ -436,6 +443,14 @@ def create_auc_table(metric='roc_auc'):
                 row_dict.update({method_name: '{:.3f} ({:.3f})'.format(*results[ds_name][sc_name][method_name])
                                  for method_name in results[ds_name][sc_name]})
                 writer.writerow(row_dict)
+
+def TimeLine(localStart_time, localEnd_time):
+    interval_sec = localEnd_time.tm_sec - localStart_time.tm_sec
+    interval_min = ((localEnd_time.tm_min - localStart_time.tm_min)*60)
+    if interval_min <= 0:
+        interval_min += 3600
+    interval = interval_min + interval_sec
+    return interval
 
 
 if __name__ == '__main__':
