@@ -20,7 +20,7 @@ Then run showRes to show the roc curve
 * Mar. 28th
 We firstly come up with a naive sliding window method, and we have our results like below:
 
-![](./img/slide_roc.png)
+![](img/slide_roc.png)
 
 
 ## Citation
